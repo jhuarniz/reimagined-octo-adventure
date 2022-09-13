@@ -1,0 +1,40 @@
+openapi: 3.0.3
+info:
+  title: Image recognition
+  description: Image recognition
+  version: 1.0.0
+servers:
+  - url: "http://localhost:8080/image-recognition/v1"
+paths:
+  /load:
+    post:
+      requestBody:
+        content:
+          multipart/form-data:
+            # application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                filter:
+                  type: array
+                  items:
+                    type: string
+                fileName:
+                  type: string
+                  format: binary
+              required:
+                - email
+                - fileName
+      responses:
+        '200':
+          description: 'bla'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestID:
+                    type: string
+
