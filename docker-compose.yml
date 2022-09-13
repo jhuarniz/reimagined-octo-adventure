@@ -1,6 +1,19 @@
 version: "3.7"
 
 services:
+  postgres:
+    image: postgres:12.3
+    restart: "no"
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${PG_USER-test}
+      POSTGRES_PASSWORD: ${PG_PASS-test}
+      POSTGRES_MULTIPLE_DATABASES: "imagerec, imagerectest"
+      POSTGRES_SCHEMAS: "imagerecognition"
+    volumes:
+      - postgres-vol:/var/lib/postgresql/data
+      - "./create_databases.sh:/docker-entrypoint-initdb.d/create_databases.sh"
   localstack:
     container_name: "${LOCALSTACK_DOCKER_NAME-localstack_main}"
     image: localstack/localstack:0.14.0
@@ -17,3 +30,4 @@ services:
 
 volumes:
   localstack-vol:
+  postgres-vol:
