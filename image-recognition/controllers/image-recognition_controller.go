@@ -23,7 +23,7 @@ func imageRecognition(c *fiber.Ctx) error {
 	}
 
 	// Call to Service
-	imgrec := dtos.ImageRecognition{c.FormValue("email"), c.FormValue("filters"), imageFile}
+	imgrec := dtos.ImageRecognition{Email: c.FormValue("email"), Filters: c.FormValue("filters"), ImageFile: imageFile}
 	requestID, err := services.NewImageRecognition().ImageRecognition(imgrec, c)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(
