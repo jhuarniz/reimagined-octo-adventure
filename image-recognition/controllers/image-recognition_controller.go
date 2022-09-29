@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/jhuarniz/reimagined-octo-adventure/api/dtos"
@@ -14,29 +14,16 @@ func ImageRecognitionController(router fiber.Router) {
 }
 
 func imageRecognition(c *fiber.Ctx) error {
-	fmt.Println("imageRecognition - Start")
-
-	// Get Email
-	email := c.FormValue("email")
-	fmt.Println(email)
-
-	// Get Filter
-	filters := c.FormValue("filters")
-	fmt.Println(filters)
+	log.Println("imageRecognition - Start")
 
 	// Get File
 	imageFile, err := c.FormFile("fileUpload")
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
-	fmt.Println(imageFile.Filename, imageFile.Size, imageFile.Header["Content-Type"][0])
 
 	// Call to Service
-	imgrec := dtos.ImageRecognition{
-		Email:     email,
-		Filters:   filters,
-		ImageFile: imageFile,
-	}
+	imgrec := dtos.ImageRecognition{c.FormValue("email"), c.FormValue("filters"), imageFile}
 	requestID, err := services.NewImageRecognition().ImageRecognition(imgrec, c)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(
@@ -48,6 +35,7 @@ func imageRecognition(c *fiber.Ctx) error {
 	}
 
 	// All OK
+	log.Println("imageRecognition - End")
 	return c.Status(fiber.StatusAccepted).JSON(
 		dtos.ResponseDto{
 			StatusCode: fiber.StatusAccepted,

@@ -2,10 +2,14 @@ package services
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"github.com/jhuarniz/reimagined-octo-adventure/api/configs"
 	"github.com/jhuarniz/reimagined-octo-adventure/api/dtos"
+	"github.com/jhuarniz/reimagined-octo-adventure/api/models"
+	"github.com/jinzhu/copier"
 )
 
 var (
@@ -27,16 +31,24 @@ func (*imgreg) ImageRecognition(model dtos.ImageRecognition, c *fiber.Ctx) (stri
 	// validate
 	err := validate.Struct(model)
 	if err != nil {
-		if _, ok := err.(*validator.InvalidValidationError); ok {
-			fmt.Println(err)
-			return "", err
-		}
-
 		return "", err
 	}
 
-	// Save File
+	// Save Image File
 	c.SaveFile(model.ImageFile, fmt.Sprintf("./%s", model.ImageFile.Filename))
 
-	return "123456", nil
+	// Parse from dto to model
+	var newModel models.ImageRecognition
+	copier.Copy(&newModel, &model)
+
+	// Persistence in DataBase
+	createdUser := configs.DB.Create(&newModel)
+	err = createdUser.Error
+	if err != nil {
+		log.Fatalln(err)
+		return "", err
+	}
+
+	// Return ID
+	return newModel.ID.String(), nil
 }
